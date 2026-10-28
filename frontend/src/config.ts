@@ -1,8 +1,7 @@
 // ---- EDIT THESE ----
-export const BRAND = "YOURBRAND";                  // your name or brand
-export const NAME = "[Your Name]";                 // shown in the About section
-export const EMAIL = "you@example.com";            // shown in the footer and used if no enquiry service is set
-export const CAL_URL = "https://cal.com/your-name"; // your booking page (Cal.com or Calendly)
+export const BRAND = "Astrax Tech";                // your brand
+export const EMAIL = "abdurhmanbereket74@gmail.com"; // shown in the footer and used if no enquiry service is set
+export const CAL_URL = "";                         // your Cal.com or Calendly link. Leave "" and "Book a Call" opens the contact form instead
 export const TECH = ["C++", "Java", "Python", "TypeScript", "React", "FastAPI", "Git & GitHub", "Vercel", "Render"]; // list only what you have really used
 export const AED_PER_USD = 3.6725;                 // AED is pegged to USD
 

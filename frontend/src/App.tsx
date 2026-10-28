@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
-import { BRAND, CAL_URL, EMAIL, ENQUIRY_URL, NAME, PLANS, TECH, money } from "./config";
+import { BRAND, CAL_URL, EMAIL, ENQUIRY_URL, PLANS, TECH, money } from "./config";
 import type { Currency } from "./config";
 import { fetchQuote, sendEnquiry } from "./api";
 import type { QuoteResult } from "./api";
 
 type ModalState = { plan: string; message: string } | null;
+type OpenContact = (plan?: string, message?: string) => void;
 
 export default function App() {
   const [cur, setCur] = useState<Currency>("USD");
@@ -20,12 +21,12 @@ export default function App() {
     <>
       <Header onContact={() => openContact()} />
       <main id="top">
-        <Hero />
+        <Hero onContact={openContact} />
         <Plans cur={cur} setCur={setCur} onPick={(name) => openContact(name)} />
         <Estimator cur={cur} onRequest={openContact} />
         <Tech />
         <About onContact={() => openContact()} />
-        <Cta onContact={() => openContact()} />
+        <Cta onContact={openContact} />
       </main>
       <Footer />
       {modal && <ContactModal plan={modal.plan} initialMessage={modal.message} onClose={() => setModal(null)} />}
@@ -61,7 +62,20 @@ function Header({ onContact }: { onContact: () => void }) {
   );
 }
 
-function Hero() {
+// "Book a Call": opens your booking page when CAL_URL is set, otherwise opens the contact form.
+function BookCall({ className, onContact }: { className: string; onContact: OpenContact }) {
+  if (CAL_URL) {
+    return <a className={className} href={CAL_URL} target="_blank" rel="noopener noreferrer">Book a Call →</a>;
+  }
+  return (
+    <button className={className}
+      onClick={() => onContact("General enquiry", "I'd like to book a call. My preferred days and times (Dubai time): ")}>
+      Book a Call →
+    </button>
+  );
+}
+
+function Hero({ onContact }: { onContact: OpenContact }) {
   return (
     <div className="hero">
       <div className="wrap">
@@ -73,7 +87,7 @@ function Hero() {
         </p>
         <div className="row">
           <a className="btn fill" href="#plans">See Plans</a>
-          <a className="btn ghost" href={CAL_URL} target="_blank" rel="noopener noreferrer">Book a Call →</a>
+          <BookCall className="btn ghost" onContact={onContact} />
         </div>
       </div>
     </div>
@@ -278,26 +292,28 @@ function About({ onContact }: { onContact: () => void }) {
       <div className="wrap about">
         <div>
           <span className="pill">About Me</span>
-          <h2>Hi, I'm <em>{NAME}</em></h2>
+          <h2>Meet <em>{BRAND}</em></h2>
           <p>
-            I'm a software developer based in Dubai. I build websites for businesses of any size, from a clean
-            one-page presence to a full platform with payments and orders.
+            I'm a software developer based in Dubai. I run {BRAND}, where I build websites for businesses of any
+            size, from a clean one-page presence to a full platform with payments and orders.
           </p>
-          <p>[Add 2 or 3 sentences: what you have built, what you studied, and why a client can trust you with their website.]</p>
+          <p>
+            You deal with me directly, from the first call to launch. Every project starts with a clear scope and a
+            price agreed before work begins.
+          </p>
           <button className="btn fill" onClick={onContact}>Work With Me</button>
         </div>
         <div className="facts">
           <div><b>Based in</b><span>Dubai, UAE</span></div>
           <div><b>Works with</b><span>Businesses of any size</span></div>
           <div><b>Reply time</b><span>Within 24 hours, Dubai time (GMT+4)</span></div>
-          <div><b>Languages</b><span>[Add yours]</span></div>
         </div>
       </div>
     </section>
   );
 }
 
-function Cta({ onContact }: { onContact: () => void }) {
+function Cta({ onContact }: { onContact: OpenContact }) {
   return (
     <section className="cta" id="contact">
       <div className="wrap">
@@ -305,8 +321,8 @@ function Cta({ onContact }: { onContact: () => void }) {
         <h2>Let's Build Your <em>Website</em></h2>
         <p>Book a free call to talk through what you need. No obligation, and no pressure.</p>
         <div className="row">
-          <a className="btn white" href={CAL_URL} target="_blank" rel="noopener noreferrer">Book a Call →</a>
-          <button className="btn ghost" onClick={onContact}>Send a Message</button>
+          <BookCall className="btn white" onContact={onContact} />
+          <button className="btn ghost" onClick={() => onContact()}>Send a Message</button>
         </div>
       </div>
     </section>
